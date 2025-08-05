@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "rpgclassabilities",
+  "version": "${version}",
+  "name": "rpgclassabilities",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/rpgclassabilities/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.mcclasses.rpgclassabilities.client.RpgclassabilitiesClient"
+    ],
+    "main": [
+      "com.mcclasses.rpgclassabilities.Rpgclassabilities"
+    ]
+  },
+  "mixins": [
+    "rpgclassabilities.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "fabric-key-binding-api-v1": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

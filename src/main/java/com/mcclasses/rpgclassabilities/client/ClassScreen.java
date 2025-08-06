@@ -1,33 +1,70 @@
 package com.mcclasses.rpgclassabilities.client;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public class ClassScreen extends Screen {
     protected ClassScreen(Text title) {
         super(title);
     }
 
-    @Override
-    protected void init() {
-        ButtonWidget buttonWidget = ButtonWidget.builder(Text.of("Hello World"), (btn) -> {
-            // When the button is clicked, we can display a toast to the screen.
-            this.client.getToastManager().add(
-                    SystemToast.create(this.client, SystemToast.Type.NARRATOR_TOGGLE, Text.of("Hello World!"), Text.of("This is a toast."))
-            );
-        }).dimensions(40, 40, 120, 20).build();
-        // x, y, width, height
-        // It's recommended to use the fixed height of 20 to prevent rendering issues with the button
-        // textures.
-
-        // Register the button widget.
-        this.addDrawableChild(buttonWidget);
-
+    enum Classes {
+        WARRIOR,
+        ROGUE,
+        CLERIC,
+        WIZARD
     }
 
+    Classes[] classOrder = {Classes.WARRIOR, Classes.ROGUE, Classes.CLERIC, Classes.WIZARD};
+    int currentClassIndex = 0;
+
+    final int yOffset = 20;
+
+    @Override
+    protected void init() {
+        int buttonWidth = 60;
+        int baseButtonY = height / 2 + 35 - yOffset;
+        int centerX = centered(width, buttonWidth);
+
+        ButtonWidget nextButton = ButtonWidget.builder(Text.of("Next"), (btn) -> {
+            currentClassIndex++;
+            currentClassIndex = currentClassIndex % 4;
+        }).dimensions(centerX, baseButtonY, buttonWidth, 20).build();
+        ButtonWidget backButton = ButtonWidget.builder(Text.of("Back"), (btn) -> {
+            currentClassIndex--;
+            if (currentClassIndex < 0) {
+                currentClassIndex = 3;
+            }
+        }).dimensions(centerX, baseButtonY + 25, buttonWidth, 20).build();
+
+        ButtonWidget selectButton = ButtonWidget.builder(Text.of("Select"), (btn) -> {
+            MinecraftClient.getInstance().setScreen(
+                    null
+            );
+        }).dimensions(centered(width, 100), baseButtonY + 60, 100, 20).build();
+
+        this.addDrawableChild(nextButton);
+        this.addDrawableChild(backButton);
+        this.addDrawableChild(selectButton);
+    }
+
+    private int  centered(int totalLength, int length) {return totalLength / 2 - length / 2;}
+    private void drawTextureCentered(DrawContext context, Identifier texture, int u, int v, int width, int height) {
+        int x = centered(context.getScaledWindowWidth(), width);
+        int y = centered(context.getScaledWindowHeight(), height) - yOffset;
+        context.drawTexture(
+                RenderPipelines.GUI_TEXTURED, texture,
+                x, y, u, v,
+                width, height, 32, 32, 64, 64
+        );
+    }
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
@@ -36,6 +73,63 @@ public class ClassScreen extends Screen {
         // We'll subtract the font height from the Y position to make the text appear above the button.
         // Subtracting an extra 10 pixels will give the text some padding.
         // textRenderer, text, x, y, color, hasShadow
-        context.drawText(this.textRenderer, "Special Button", 40, 40 - this.textRenderer.fontHeight - 10, 0xFFFFFFFF, true);
+        Identifier iconsTexture = Identifier.of("rpgclassabilities", "textures/class/class_icons.png");
+        int width = 64;
+        int height = 64;
+        int centeredX = centered(context.getScaledWindowWidth(), width);
+        int centeredY = centered(context.getScaledWindowHeight(), height);
+
+        Classes currentClass = classOrder[currentClassIndex];
+
+        // Warrior
+        String text = "";
+        int u = 0;
+        int v = 0;
+
+        switch (currentClass) {
+            case WARRIOR -> {
+                text = "Warrior";
+            }
+            case ROGUE -> {
+                text = "Rogue";
+                u = 32;
+            }
+            case CLERIC -> {
+                text = "Cleric";
+                v = 32;
+            }
+            case WIZARD -> {
+                text = "Wizard";
+                u = 32;
+                v = 32;
+            }
+        }
+
+        context.drawText(client.textRenderer, text, centeredX, centeredY - 10 - yOffset, 0xFFFFFFFF, true);
+        drawTextureCentered(context, iconsTexture, u, v, width, height);
+        // Rogue
+//        int rogueX = baseX + offsetX;
+//        context.drawText(client.textRenderer, "Rogue", rogueX, labelY, 0xFFFFFFFF, true);
+//        context.drawTexture(
+//                RenderPipelines.GUI_TEXTURED, iconsTexture,
+//                rogueX, y, 32, 0,
+//                width, height, regionWidth, regionHeight, textureWidth, textureHeight
+//        );
+//        // Cleric
+//        int clericX = baseX + offsetX * 2;
+//        context.drawText(client.textRenderer, "Cleric", clericX, labelY, 0xFFFFFFFF, true);
+//        context.drawTexture(
+//                RenderPipelines.GUI_TEXTURED, iconsTexture,
+//                clericX, y, 0, 32,
+//                width, height, regionWidth, regionHeight, textureWidth, textureHeight
+//        );
+//        // Wizard
+//        int wizardX = baseX + offsetX * 3;
+//        context.drawText(client.textRenderer, "Wizard", wizardX, labelY, 0xFFFFFFFF, true);
+//        context.drawTexture(
+//                RenderPipelines.GUI_TEXTURED, iconsTexture,
+//                wizardX, y, 32, 32,
+//                width, height, regionWidth, regionHeight, textureWidth, textureHeight
+//        );
     }
 }

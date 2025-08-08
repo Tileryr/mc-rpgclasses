@@ -1,12 +1,14 @@
 package com.mcclasses.rpgclassabilities.client;
 
+import com.mcclasses.rpgclassabilities.RpgClass;
+import com.mcclasses.rpgclassabilities.SelectClassC2SPayload;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.toast.SystemToast;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -15,14 +17,8 @@ public class ClassScreen extends Screen {
         super(title);
     }
 
-    enum Classes {
-        WARRIOR,
-        ROGUE,
-        CLERIC,
-        WIZARD
-    }
 
-    Classes[] classOrder = {Classes.WARRIOR, Classes.ROGUE, Classes.CLERIC, Classes.WIZARD};
+    RpgClass[] classOrder = {RpgClass.WARRIOR, RpgClass.ROGUE, RpgClass.CLERIC, RpgClass.WIZARD};
     int currentClassIndex = 0;
 
     final int yOffset = 20;
@@ -45,6 +41,8 @@ public class ClassScreen extends Screen {
         }).dimensions(centerX, baseButtonY + 25, buttonWidth, 20).build();
 
         ButtonWidget selectButton = ButtonWidget.builder(Text.of("Select"), (btn) -> {
+            SelectClassC2SPayload payload = new SelectClassC2SPayload(classOrder[currentClassIndex]);
+            ClientPlayNetworking.send(payload);
             MinecraftClient.getInstance().setScreen(
                     null
             );
@@ -79,7 +77,7 @@ public class ClassScreen extends Screen {
         int centeredX = centered(context.getScaledWindowWidth(), width);
         int centeredY = centered(context.getScaledWindowHeight(), height);
 
-        Classes currentClass = classOrder[currentClassIndex];
+        RpgClass currentClass = classOrder[currentClassIndex];
 
         // Warrior
         String text = "";
@@ -87,18 +85,18 @@ public class ClassScreen extends Screen {
         int v = 0;
 
         switch (currentClass) {
-            case WARRIOR -> {
+            case RpgClass.WARRIOR -> {
                 text = "Warrior";
             }
-            case ROGUE -> {
+            case RpgClass.ROGUE -> {
                 text = "Rogue";
                 u = 32;
             }
-            case CLERIC -> {
+            case RpgClass.CLERIC -> {
                 text = "Cleric";
                 v = 32;
             }
-            case WIZARD -> {
+            case RpgClass.WIZARD -> {
                 text = "Wizard";
                 u = 32;
                 v = 32;

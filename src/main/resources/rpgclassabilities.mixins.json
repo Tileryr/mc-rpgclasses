@@ -4,8 +4,7 @@
   "package": "com.mcclasses.rpgclassabilities.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PlayerMoveSpeedMixin",
-    "DefaultAttributeRegistryMixin"
+    "PersistentStateManagerMixin"
   ],
   "client": [
   ],

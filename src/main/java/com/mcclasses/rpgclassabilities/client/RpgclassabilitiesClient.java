@@ -16,12 +16,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.logging.Logger;
 
 public class RpgclassabilitiesClient implements ClientModInitializer {
     private static KeyBinding keyBinding;
-    public static final String MOD_ID = "rpgclassabilities";
-    public static final Logger LOGGER = Logger.getLogger(MOD_ID);
+
 
     @Override
     public void onInitializeClient() {
@@ -51,16 +49,13 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
 
 
         });
-        ServerPlayConnectionEvents.JOIN.register((a, b, c) -> {
-            a.player.getAttributes().getCustomInstance(EntityAttributes.MOVEMENT_SPEED).setBaseValue(1.0);
-            LoggerHelper.getLOGGER().info("ServerConnected");
-        });
+
         ClientPlayConnectionEvents.JOIN.register((t, a, client) -> {
             client.setScreen(
                     new ClassScreen(Text.empty())
             );
             double moveSpeed = client.player.getAttributeValue(EntityAttributes.MOVEMENT_SPEED);
-            LOGGER.info(Double.toString(moveSpeed));
+            LoggerHelper.getLOGGER().info(Double.toString(moveSpeed));
         });
     }
 }

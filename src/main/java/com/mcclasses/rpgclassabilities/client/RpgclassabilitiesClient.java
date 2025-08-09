@@ -1,10 +1,13 @@
 package com.mcclasses.rpgclassabilities.client;
 
 import com.mcclasses.rpgclassabilities.LoggerHelper;
+import com.mcclasses.rpgclassabilities.OpenClassSelectS2CPayload;
+import com.mcclasses.rpgclassabilities.UpdateCurrentClassS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -29,31 +32,23 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
                 GLFW.GLFW_KEY_C,
                 "category.rpgclassabilities.rpgclasses"
         ));
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (keyBinding.wasPressed())
-            {
-                MinecraftClient.getInstance().setScreen(
-                        new ClassScreen(Text.empty())
-                );
-                double moveSpeed = PlayerEntity.createPlayerAttributes().build().getValue(EntityAttributes.MOVEMENT_SPEED);
-                double nextMoveSpeed = new AttributeContainer(PlayerEntity.createPlayerAttributes().build()).getValue(EntityAttributes.MOVEMENT_SPEED);
-
-//                client.player.getAttributes().setFrom(new AttributeContainer(PlayerEntity.createPlayerAttributes().build()));
-
-                double currentMoveSpeed = client.player.getAttributeValue(EntityAttributes.MOVEMENT_SPEED);
-
-                client.player.sendMessage(Text.literal(Double.toString(moveSpeed)), false);
-                client.player.sendMessage(Text.literal(Double.toString(nextMoveSpeed)), false);
-                client.player.sendMessage(Text.literal(Double.toString(currentMoveSpeed)), false);
-            }
-
-
-        });
-
-        ClientPlayConnectionEvents.JOIN.register((t, a, client) -> {
+//        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+//            while (keyBinding.wasPressed())
+//            {
+//                MinecraftClient.getInstance().setScreen(
+//                        new ClassScreen(Text.empty())
+//                );
+//            }
+//        });
+        CurrentRpgClass.activate();
+        ClientPlayNetworking.registerGlobalReceiver(OpenClassSelectS2CPayload.ID, (payload, context) -> {
+            MinecraftClient client = context.client();
             client.setScreen(
                     new ClassScreen(Text.empty())
             );
+        });
+
+        ClientPlayConnectionEvents.JOIN.register((t, a, client) -> {
             double moveSpeed = client.player.getAttributeValue(EntityAttributes.MOVEMENT_SPEED);
             LoggerHelper.getLOGGER().info(Double.toString(moveSpeed));
         });

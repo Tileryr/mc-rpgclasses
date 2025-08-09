@@ -18,11 +18,11 @@ public abstract class PersistentStateManagerMixin {
 
     @Inject(method = "getOrCreate", at = @At("HEAD"))
     private void getOrCreateMixin(PersistentStateType type, CallbackInfoReturnable cir) {
-        PersistentState persistentState = get(type);
-        if (persistentState != null) {
-            LoggerHelper.getLOGGER().info(persistentState.toString());
-        } else {
-            LoggerHelper.getLOGGER().info("State null");
-        }
+//        PersistentState persistentState = get(type);
+//        if (persistentState != null) {
+//            LoggerHelper.getLOGGER().info(persistentState.toString());
+//        } else {
+//            LoggerHelper.getLOGGER().info("State null");
+//        }
     }
 }

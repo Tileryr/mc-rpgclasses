@@ -23,7 +23,8 @@ public class StateSaverAndLoader extends PersistentState {
     }
 
     private StateSaverAndLoader(Map<UUID, PlayerData> players) {
-        players.forEach(((uuid, playerData) -> {LoggerHelper.getLOGGER().info(uuid + " : " + playerData.getClass());}));
+
+//        players.forEach(((uuid, playerData) -> {LoggerHelper.getLOGGER().info(uuid + " : " + playerData.getClass());}));
         this.players = new HashMap<>(players);
     }
 
@@ -42,19 +43,23 @@ public class StateSaverAndLoader extends PersistentState {
             null
     );
 
-    public static StateSaverAndLoader getServerState(MinecraftServer server) {
+    public static StateSaverAndLoader getServerState(MinecraftServer server, boolean markDirty) {
         ServerWorld serverWorld = server.getWorld(World.OVERWORLD);
         assert serverWorld != null;
 
         StateSaverAndLoader state = serverWorld.getPersistentStateManager().getOrCreate(type);
-        state.markDirty();
+
+        if (markDirty) {
+            state.markDirty();
+        }
         return state;
     }
 
-    public static PlayerData getPlayerState(LivingEntity player) {
-        StateSaverAndLoader serverState = getServerState(player.getServer());
+    public static PlayerData getPlayerState(LivingEntity player, boolean markDirty) {
+        StateSaverAndLoader serverState = getServerState(player.getServer(), markDirty);
 
         PlayerData playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> {
+
             return new PlayerData();
         });
 

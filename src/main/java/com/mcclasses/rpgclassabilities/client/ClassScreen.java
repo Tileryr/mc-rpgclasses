@@ -42,6 +42,7 @@ public class ClassScreen extends Screen {
 
         ButtonWidget selectButton = ButtonWidget.builder(Text.of("Select"), (btn) -> {
             SelectClassC2SPayload payload = new SelectClassC2SPayload(classOrder[currentClassIndex]);
+
             ClientPlayNetworking.send(payload);
             MinecraftClient.getInstance().setScreen(
                     null

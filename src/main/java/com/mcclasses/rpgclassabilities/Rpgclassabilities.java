@@ -3,18 +3,23 @@ package com.mcclasses.rpgclassabilities;
 import com.mcclasses.rpgclassabilities.commands.SetClassCommand;
 import com.mcclasses.rpgclassabilities.enums.RpgClass;
 import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
+import com.mcclasses.rpgclassabilities.payload.c2s.PlayerDashC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.OpenClassSelectS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
+import com.mcclasses.rpgclassabilities.timers.TimerRegister;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 
 public class Rpgclassabilities implements ModInitializer {
@@ -32,9 +37,8 @@ public class Rpgclassabilities implements ModInitializer {
     @Override
     public void onInitialize() {
         PayloadRegister.register();
-//        PayloadTypeRegistry.playS2C().register(OpenClassSelectS2CPayload.ID, OpenClassSelectS2CPayload.CODEC);
-//        PayloadTypeRegistry.playS2C().register(UpdateCurrentClassS2CPayload.ID, UpdateCurrentClassS2CPayload.CODEC);
-//        PayloadTypeRegistry.playC2S().register(SelectClassC2SPayload.ID, SelectClassC2SPayload.CODEC);
+        TimerRegister.register();
+        Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, "dash_smoke"), FabricParticleTypes.simple());
 
         ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, minecraftServer) -> {
             ServerPlayerEntity player = serverPlayNetworkHandler.player;
@@ -47,7 +51,7 @@ public class Rpgclassabilities implements ModInitializer {
                 setRpgClass(playerData.playerClass, player);
             }
 
-            serverPlayNetworkHandler.player.getAttributes().getCustomInstance(EntityAttributes.MOVEMENT_SPEED).setBaseValue(1.0);
+            serverPlayNetworkHandler.player.getAttributes().getCustomInstance(EntityAttributes.MOVEMENT_SPEED).setBaseValue(0.1);
         });
 
         ServerPlayNetworking.registerGlobalReceiver(SelectClassC2SPayload.ID, (payload, context) -> {
@@ -56,6 +60,10 @@ public class Rpgclassabilities implements ModInitializer {
                 setRpgClass(payload.rpgClass(), context.player());
             }
         });
+
+        ServerPlayNetworking.registerGlobalReceiver(PlayerDashC2SPayload.ID, ((payload, context) -> {
+            new PlayerDash(context.player());
+        }));
 
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
             dispatcher.register(CommandManager.literal("setclass")

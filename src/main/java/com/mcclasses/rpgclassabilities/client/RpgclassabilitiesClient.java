@@ -1,12 +1,15 @@
 package com.mcclasses.rpgclassabilities.client;
 
 import com.mcclasses.rpgclassabilities.LoggerHelper;
+import com.mcclasses.rpgclassabilities.payload.c2s.PlayerDashC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.OpenClassSelectS2CPayload;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -26,14 +29,19 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
                 GLFW.GLFW_KEY_C,
                 "category.rpgclassabilities.rpgclasses"
         ));
-//        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-//            while (keyBinding.wasPressed())
-//            {
-//                MinecraftClient.getInstance().setScreen(
-//                        new ClassScreen(Text.empty())
-//                );
-//            }
-//        });
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (keyBinding.wasPressed())
+            {
+                ClientPlayerEntity player = client.player;
+                double headYaw = player.headYaw % 360;
+                if (headYaw < 0) {
+                    headYaw += 360;
+                }
+                player.sendMessage(Text.literal("yaw: " + headYaw + " pitch: " + player.getPitch()), true);
+
+                ClientPlayNetworking.send(new PlayerDashC2SPayload());
+            }
+        });
         CurrentRpgClass.activate();
         ClientPlayNetworking.registerGlobalReceiver(OpenClassSelectS2CPayload.ID, (payload, context) -> {
             MinecraftClient client = context.client();

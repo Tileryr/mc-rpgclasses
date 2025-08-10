@@ -1,6 +1,7 @@
 package com.mcclasses.rpgclassabilities.payload;
 
 import com.google.common.collect.ImmutableMap;
+import com.mcclasses.rpgclassabilities.payload.c2s.PlayerDashC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.OpenClassSelectS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
@@ -17,12 +18,12 @@ public class PayloadRegister {
     static private final Map<CustomPayload.Id, PacketCodec> S2CPayloads = ImmutableMap.<CustomPayload.Id, PacketCodec>builder()
             .put(OpenClassSelectS2CPayload.ID, OpenClassSelectS2CPayload.CODEC)
             .put(UpdateCurrentClassS2CPayload.ID, UpdateCurrentClassS2CPayload.CODEC)
-            .put(SelectClassC2SPayload.ID, SelectClassC2SPayload.CODEC)
 
             .build();
 
     static private final Map<CustomPayload.Id, PacketCodec> C2SPayloads = ImmutableMap.<CustomPayload.Id, PacketCodec>builder()
             .put(SelectClassC2SPayload.ID, SelectClassC2SPayload.CODEC)
+            .put(PlayerDashC2SPayload.ID, PlayerDashC2SPayload.CODEC)
 
             .build();
 
@@ -35,6 +36,5 @@ public class PayloadRegister {
         C2SPayloads.forEach(((id, codec) -> {
             PayloadTypeRegistry.playC2S().register(id, codec);
         }));
-
     }
 }

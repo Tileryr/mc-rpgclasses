@@ -1,14 +1,13 @@
 package com.mcclasses.rpgclassabilities.client;
 
-import com.mcclasses.rpgclassabilities.RpgClass;
-import com.mcclasses.rpgclassabilities.SelectClassC2SPayload;
+import com.mcclasses.rpgclassabilities.enums.RpgClass;
+import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -16,7 +15,6 @@ public class ClassScreen extends Screen {
     protected ClassScreen(Text title) {
         super(title);
     }
-
 
     RpgClass[] classOrder = {RpgClass.WARRIOR, RpgClass.ROGUE, RpgClass.CLERIC, RpgClass.WIZARD};
     int currentClassIndex = 0;

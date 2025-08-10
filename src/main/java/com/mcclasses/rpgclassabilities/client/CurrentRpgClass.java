@@ -1,10 +1,8 @@
 package com.mcclasses.rpgclassabilities.client;
 
-import com.mcclasses.rpgclassabilities.LoggerHelper;
-import com.mcclasses.rpgclassabilities.RpgClass;
-import com.mcclasses.rpgclassabilities.UpdateCurrentClassS2CPayload;
+import com.mcclasses.rpgclassabilities.enums.RpgClass;
+import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.text.Text;
 
 public class CurrentRpgClass {
     private static RpgClass currentRpgClass;

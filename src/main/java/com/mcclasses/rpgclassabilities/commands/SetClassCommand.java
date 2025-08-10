@@ -1,8 +1,9 @@
-package com.mcclasses.rpgclassabilities;
+package com.mcclasses.rpgclassabilities.commands;
 
+import com.mcclasses.rpgclassabilities.Rpgclassabilities;
+import com.mcclasses.rpgclassabilities.enums.RpgClass;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.LiteralMessage;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;

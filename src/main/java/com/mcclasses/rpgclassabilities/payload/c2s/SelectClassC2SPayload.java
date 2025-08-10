@@ -1,5 +1,7 @@
-package com.mcclasses.rpgclassabilities;
+package com.mcclasses.rpgclassabilities.payload.c2s;
 
+import com.mcclasses.rpgclassabilities.enums.RpgClass;
+import com.mcclasses.rpgclassabilities.Rpgclassabilities;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;

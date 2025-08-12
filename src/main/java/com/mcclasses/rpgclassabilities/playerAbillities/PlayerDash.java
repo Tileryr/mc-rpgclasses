@@ -1,5 +1,6 @@
-package com.mcclasses.rpgclassabilities;
+package com.mcclasses.rpgclassabilities.playerAbillities;
 
+import com.mcclasses.rpgclassabilities.Rpgclassabilities;
 import com.mcclasses.rpgclassabilities.util.Conversion;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;

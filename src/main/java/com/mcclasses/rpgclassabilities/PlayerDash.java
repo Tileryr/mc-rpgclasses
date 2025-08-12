@@ -1,6 +1,6 @@
 package com.mcclasses.rpgclassabilities;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import com.mcclasses.rpgclassabilities.util.Conversion;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MarkerEntity;
@@ -9,27 +9,32 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.TeleportTarget;
 
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerDash {
-    private static final long DASH_TIME = 6L;
-    private static final float DASH_DISTANCE = 12;
+    public static final int DASH_TIME = 6;
+    public static final int DASH_COOLDOWN = 40;
+    public static final float DASH_DISTANCE = 12;
     private static final Identifier MOVEMENT_MODIFIER_ID = Identifier.of(Rpgclassabilities.MOD_ID, "dash_speed_halt");
 
-    private ServerPlayerEntity player;
-    private float playerHeadYaw;
-    private float playerPitch;
-    private Vec3d playerPosition;
-    private ServerWorld playerWorld;
+    private static Map<UUID, Boolean> playersCanDash = new HashMap<>();
+
+    private final ServerPlayerEntity player;
+    private final float playerHeadYaw;
+    private final float playerPitch;
+    private final Vec3d playerPosition;
+    private final ServerWorld playerWorld;
 
     public PlayerDash(ServerPlayerEntity player) {
         this.player = player;
@@ -42,15 +47,26 @@ public class PlayerDash {
     }
 
     private void dashPlayer() {
+        if (!playerCanDash(player)) {
+            player.sendMessage( Text.literal(
+                    "Dash cooldown: " + Conversion.ticksToSeconds(Rpgclassabilities.SCHEDULER.getTicksLeft(player.getUuid())) + "s") ,
+                    true
+            );
+            return;
+        } else {
+            setPlayerCanDash(player,false);
+        }
+
         Vec3d playerPosition = player.getPos();
 
         EntityAttributeInstance playerMovement = player.getAttributes().getCustomInstance(EntityAttributes.MOVEMENT_SPEED);
-
-        playerMovement.addTemporaryModifier(new EntityAttributeModifier(
-                MOVEMENT_MODIFIER_ID,
-                -1F,
-                EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-        ));
+        if (!playerMovement.hasModifier(MOVEMENT_MODIFIER_ID)) {
+            playerMovement.addTemporaryModifier(new EntityAttributeModifier(
+                    MOVEMENT_MODIFIER_ID,
+                    -1F,
+                    EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+            ));
+        }
 
         MarkerEntity markerEntity = EntityType.MARKER.spawn(player.getWorld(), player.getBlockPos(), SpawnReason.EVENT);
         markerEntity.setHeadYaw(player.headYaw);
@@ -59,15 +75,7 @@ public class PlayerDash {
 
         spawnDashSmoke(player.getWorld(), playerPosition);
         setHidden(true);
-        DashTeleportTimer.INSTANCE.setTimer(DASH_TIME, this::dashTeleport);
-    }
-
-    private static void spawnDashSmoke(ServerWorld world, Vec3d position) {
-        world.spawnParticles(
-                ParticleTypes.EXPLOSION,
-                position.x, position.y, position.z,
-                50, 1, 0.5, 1, 1
-        );
+        Rpgclassabilities.SCHEDULER.addTimer(DASH_TIME, this::dashTeleport);
     }
 
     private void dashTeleport() {
@@ -101,27 +109,29 @@ public class PlayerDash {
 
         spawnDashSmoke(player.getWorld(), dashTarget);
         setHidden(false);
+        Rpgclassabilities.SCHEDULER.addTimer(player.getUuid(), DASH_COOLDOWN, () -> {
+            setPlayerCanDash(player, true);
+        });
+    }
+
+    private static void spawnDashSmoke(ServerWorld world, Vec3d position) {
+        world.spawnParticles(
+                ParticleTypes.EXPLOSION,
+                position.x, position.y, position.z,
+                50, 1, 0.5, 1, 1
+        );
+    }
+
+    private void setPlayerCanDash(ServerPlayerEntity player, boolean dashAble) {
+        playersCanDash.put(player.getUuid(), dashAble);
+    }
+
+    private boolean playerCanDash(ServerPlayerEntity player) {
+        return playersCanDash.computeIfAbsent(player.getUuid(), uuid -> true);
     }
 
     private void setHidden(boolean on) {
         player.setInvulnerable(on);
         player.setInvisible(on);
-    }
-    public static class DashTeleportTimer implements ServerTickEvents.EndTick {
-        public static final DashTeleportTimer INSTANCE = new DashTeleportTimer();
-        private long ticksUntilTeleport;
-        Runnable callback;
-
-        public void setTimer(long ticksUntilTeleport, Runnable callback) {
-            this.ticksUntilTeleport = ticksUntilTeleport;
-            this.callback = callback;
-        }
-
-        @Override
-        public void onEndTick(MinecraftServer server) {
-            if (--ticksUntilTeleport == 0L) {
-                callback.run();
-            }
-        }
     }
 }

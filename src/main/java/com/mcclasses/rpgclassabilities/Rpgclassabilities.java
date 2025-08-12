@@ -7,10 +7,11 @@ import com.mcclasses.rpgclassabilities.payload.c2s.PlayerDashC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.OpenClassSelectS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
-import com.mcclasses.rpgclassabilities.timers.TimerRegister;
+import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
@@ -23,6 +24,7 @@ import net.minecraft.util.Identifier;
 
 
 public class Rpgclassabilities implements ModInitializer {
+    public static final TickScheduler SCHEDULER = new TickScheduler();
     public static final String MOD_ID = "rpgclassabilities";
 
     public static void setRpgClass(RpgClass rpgClass, ServerPlayerEntity player) {
@@ -36,8 +38,8 @@ public class Rpgclassabilities implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ServerTickEvents.END_SERVER_TICK.register(SCHEDULER);
         PayloadRegister.register();
-        TimerRegister.register();
         Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, "dash_smoke"), FabricParticleTypes.simple());
 
         ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, minecraftServer) -> {

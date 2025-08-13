@@ -32,6 +32,7 @@ public class PlayerDash {
     private static Map<UUID, Boolean> playersCanDash = new HashMap<>();
 
     private final ServerPlayerEntity player;
+    private final Vec3d playerRotationVector;
     private final float playerHeadYaw;
     private final float playerPitch;
     private final Vec3d playerPosition;
@@ -39,6 +40,7 @@ public class PlayerDash {
 
     public PlayerDash(ServerPlayerEntity player) {
         this.player = player;
+        this.playerRotationVector = player.getRotationVector();
         this.playerHeadYaw = player.headYaw;
         this.playerPitch = player.getPitch();
         this.playerPosition = player.getPos();
@@ -80,18 +82,9 @@ public class PlayerDash {
     }
 
     private void dashTeleport() {
-        float headYaw = playerHeadYaw % 360;
-        if (headYaw < 0) {
-            headYaw += 360;
-        }
-        headYaw = Math.abs(headYaw - 360);
-        float headYawRadians = (headYaw / 360) * (float) Math.TAU;
-        Vec3d yawVector = new Vec3d(Math.sin(headYawRadians), 0, Math.cos(headYawRadians));
+        Vec3d goalDashTarget = playerRotationVector.multiply(DASH_DISTANCE).add(playerPosition);
 
-        Vec3d goalDashTarget = yawVector.multiply(DASH_DISTANCE).add(playerPosition);
-        Vec3i roundedDashTarget = new Vec3i((int) goalDashTarget.x, (int) goalDashTarget.y, (int) goalDashTarget.z);
-
-        BlockPos blockPosition = new BlockPos(roundedDashTarget);
+        BlockPos blockPosition = BlockPos.ofFloored(goalDashTarget);
         BlockState blockAtDashTarget = playerWorld.getBlockState(blockPosition);
 
         int targetYOffset = 0;

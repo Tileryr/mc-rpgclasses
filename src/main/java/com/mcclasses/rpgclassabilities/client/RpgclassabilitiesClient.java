@@ -25,7 +25,7 @@ import org.lwjgl.glfw.GLFW;
 public class RpgclassabilitiesClient implements ClientModInitializer {
     public static final TickScheduler SCHEDULER = new TickScheduler();
 
-    public static final EntityModelLayer MODEL_BIND_PROJECTILE_LAYER = new EntityModelLayer(Rpgclassabilities.BIND_PROJECTILE_ID, "main");
+    public static final EntityModelLayer BIND_PROJECTILE_MODEL_LAYER = new EntityModelLayer(Rpgclassabilities.BIND_PROJECTILE_ID, "main");
 
     private static final KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.rpgclassabilities.ability_1",
@@ -48,7 +48,7 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.register(Rpgclassabilities.BIND_PROJECTILE, BindProjectileEntityRenderer::new);
-        EntityModelLayerRegistry.registerModelLayer(MODEL_BIND_PROJECTILE_LAYER, BindProjectileEntityModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(BIND_PROJECTILE_MODEL_LAYER, BindProjectileEntityModel::getTexturedModelData);
 
         CurrentRpgClass.register();
         ClientPlayNetworking.registerGlobalReceiver(PayloadRegister.OPEN_CLASS_SELECT.id, (payload, context) -> {

@@ -14,6 +14,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
@@ -26,10 +27,6 @@ public class BindProjectileEntity extends ProjectileEntity {
     private static final TrackedData<Vector3f> TARGET_DIRECTION =
             DataTracker.registerData(BindProjectileEntity.class, TrackedDataHandlerRegistry.VECTOR_3F);
     private Vec3d targetDirection = new Vec3d(1, 1, 1);
-
-    private int lifespanTicks = 0;
-
-
 
     public BindProjectileEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
         super(entityType, world);
@@ -54,14 +51,12 @@ public class BindProjectileEntity extends ProjectileEntity {
     @Override
     protected void writeCustomData(WriteView writeView) {
         super.writeCustomData(writeView);
-        LoggerHelper.getLOGGER().info("Write");
         writeView.put("targetDirection", Vec3d.CODEC, targetDirection);
     }
 
     @Override
     protected void readCustomData(ReadView readView) {
         super.readCustomData(readView);
-        LoggerHelper.getLOGGER().info("Read");
         this.targetDirection = readView.read("targetDirection", Vec3d.CODEC).orElse(Vec3d.ZERO);
     }
 
@@ -72,6 +67,7 @@ public class BindProjectileEntity extends ProjectileEntity {
 
         if (!isClient) {
             setVelocity(targetDirection.multiply(TRAVEL_SPEED));
+            updateRotation();
         }
 
         if (isClient) {
@@ -81,7 +77,6 @@ public class BindProjectileEntity extends ProjectileEntity {
         Vec3d vec3d = this.getVelocity();
         this.setPosition(this.getPos().add(vec3d));
         this.tickBlockCollision();
-        lifespanTicks++;
     }
 
     @Override

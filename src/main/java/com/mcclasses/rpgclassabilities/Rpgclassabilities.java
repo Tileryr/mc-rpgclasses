@@ -6,6 +6,7 @@ import com.mcclasses.rpgclassabilities.enums.RpgClass;
 import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
 import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
+import com.mcclasses.rpgclassabilities.playerAbillities.BindManager;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -35,13 +36,14 @@ public class Rpgclassabilities implements ModInitializer {
     public static final TickScheduler SCHEDULER = new TickScheduler();
     public static final String MOD_ID = "rpgclassabilities";
 
+    public static final BindManager BIND_MANAGER = new BindManager();
     public static final Identifier BIND_PROJECTILE_ID = Identifier.of(MOD_ID, "bind_projectile");
     public static final EntityType<BindProjectileEntity> BIND_PROJECTILE = Registry.register(
             Registries.ENTITY_TYPE,
             BIND_PROJECTILE_ID,
             EntityType.Builder
                     .<BindProjectileEntity>create(BindProjectileEntity::new, SpawnGroup.MISC)
-                    .dimensions(1F, 1F)
+                    .dimensions(5F, 5F)
                     .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, BIND_PROJECTILE_ID))
             );
 

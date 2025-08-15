@@ -11,10 +11,14 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
@@ -64,10 +68,17 @@ public class BindProjectileEntity extends ProjectileEntity {
     public void tick() {
         super.tick();
         boolean isClient = this.getWorld().isClient;
+        HitResult hitResult = null;
 
         if (!isClient) {
             setVelocity(targetDirection.multiply(TRAVEL_SPEED));
             updateRotation();
+
+            hitResult = ProjectileUtil.getCollision(this, this::canHit);
+        }
+
+        if (hitResult != null && hitResult.getType() != HitResult.Type.MISS) {
+            hitOrDeflect(hitResult);
         }
 
         if (isClient) {
@@ -77,6 +88,23 @@ public class BindProjectileEntity extends ProjectileEntity {
         Vec3d vec3d = this.getVelocity();
         this.setPosition(this.getPos().add(vec3d));
         this.tickBlockCollision();
+    }
+
+    @Override
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
+
+        LoggerHelper.getLOGGER().info("HHt");
+        if (getWorld().isClient()) {return;}
+        if (!(entityHitResult.getEntity() instanceof LivingEntity hitEntity)) {return;}
+        if (!(getOwner() instanceof LivingEntity shooter)) {return;}
+
+        if (getWorld() instanceof ServerWorld world) {
+            Rpgclassabilities.BIND_MANAGER.removeBind(shooter, world);
+            Rpgclassabilities.BIND_MANAGER.addBind(shooter, hitEntity);
+        }
+
+        this.discard();
     }
 
     @Override

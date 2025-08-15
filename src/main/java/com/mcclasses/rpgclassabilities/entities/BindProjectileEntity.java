@@ -44,6 +44,10 @@ public class BindProjectileEntity extends ProjectileEntity {
         setOwner(owner);
         setTargetDirection(targetDirection);
         dataTracker.set(TARGET_DIRECTION, new Vector3f((float) targetDirection.x, (float) targetDirection.y, (float) targetDirection.z));
+
+        if (!getWorld().isClient) {
+            Rpgclassabilities.BIND_MANAGER.removeBind(owner, getServer());
+        }
     }
 
     private void setTargetDirection(Vec3d targetDirection) {
@@ -102,12 +106,15 @@ public class BindProjectileEntity extends ProjectileEntity {
         if (!(getOwner() instanceof LivingEntity shooter)) {return;}
 
         if (getWorld() instanceof ServerWorld world) {
-            Rpgclassabilities.BIND_MANAGER.removeBind(shooter, world);
             Rpgclassabilities.BIND_MANAGER.addBind(shooter, hitEntity);
 
-            DamageSource damageSource = new DamageSource(world.getRegistryManager().getEntryOrThrow(RpgclassabilitiesDamageTypes.BIND));
+            DamageSource damageSource = new DamageSource(
+                    world.getRegistryManager().getEntryOrThrow(RpgclassabilitiesDamageTypes.BIND),
+                    getPos()
+            );
 
             shooter.damage(world, damageSource, 2.0F);
+            hitEntity.damage(world, damageSource, 2.0F);
         }
 
         this.discard();

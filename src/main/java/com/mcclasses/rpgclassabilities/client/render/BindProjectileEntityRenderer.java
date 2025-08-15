@@ -5,10 +5,7 @@ import com.mcclasses.rpgclassabilities.Rpgclassabilities;
 import com.mcclasses.rpgclassabilities.client.RpgclassabilitiesClient;
 import com.mcclasses.rpgclassabilities.entities.BindProjectileEntity;
 import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EnderDragonEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -159,7 +156,7 @@ public class BindProjectileEntityRenderer extends EntityRenderer<BindProjectileE
                 .color(Colors.WHITE)
                 .texture(textureUV.x, textureUV.y)
                 .overlay(OverlayTexture.DEFAULT_UV)
-                .light(255)
-                .normal(entry, 0.0F, -1.0F, 0.0F);
+                .light(LightmapTextureManager.MAX_SKY_LIGHT_COORDINATE)
+                .normal(entry, 0.0F, 1.0F, 0.0F);
     }
 }

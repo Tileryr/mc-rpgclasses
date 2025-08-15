@@ -2,9 +2,11 @@ package com.mcclasses.rpgclassabilities.entities;
 
 import com.mcclasses.rpgclassabilities.LoggerHelper;
 import com.mcclasses.rpgclassabilities.Rpgclassabilities;
+import com.mcclasses.rpgclassabilities.data.RpgclassabilitiesDamageTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -102,6 +104,10 @@ public class BindProjectileEntity extends ProjectileEntity {
         if (getWorld() instanceof ServerWorld world) {
             Rpgclassabilities.BIND_MANAGER.removeBind(shooter, world);
             Rpgclassabilities.BIND_MANAGER.addBind(shooter, hitEntity);
+
+            DamageSource damageSource = new DamageSource(world.getRegistryManager().getEntryOrThrow(RpgclassabilitiesDamageTypes.BIND));
+
+            shooter.damage(world, damageSource, 2.0F);
         }
 
         this.discard();

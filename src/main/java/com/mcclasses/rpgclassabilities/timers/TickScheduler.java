@@ -7,7 +7,7 @@ import net.minecraft.server.MinecraftServer;
 
 import java.util.*;
 
-public class TickScheduler implements ServerTickEvents.EndTick, ClientTickEvents.EndTick {
+public class TickScheduler {
     private static class ScheduledCallback {
         public int ticksUntilCall;
         public Runnable callback;
@@ -46,12 +46,10 @@ public class TickScheduler implements ServerTickEvents.EndTick, ClientTickEvents
         return activeTimers.get(id).ticksUntilCall;
     }
 
-    @Override
     public void onEndTick(MinecraftServer server) {
         tick();
     }
 
-    @Override
     public void onEndTick(MinecraftClient server) {
         tick();
     }

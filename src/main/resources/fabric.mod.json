@@ -15,6 +15,9 @@
     ],
     "main": [
       "com.mcclasses.rpgclassabilities.Rpgclassabilities"
+    ],
+    "fabric-datagen": [
+      "com.mcclasses.rpgclassabilities.datagen.RpgclassabilitiesDataGenerator"
     ]
   },
   "mixins": [

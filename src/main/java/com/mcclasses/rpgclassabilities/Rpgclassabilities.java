@@ -58,7 +58,7 @@ public class Rpgclassabilities implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ServerTickEvents.END_SERVER_TICK.register(SCHEDULER);
+        ServerTickEvents.END_SERVER_TICK.register(SCHEDULER::onEndTick);
         PayloadRegister.register();
         Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, "dash_smoke"), FabricParticleTypes.simple());
 

@@ -55,7 +55,7 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
             context.client().setScreen(new ClassScreen(Text.empty()));
         });
 
-        ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER);
+        ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER::onEndTick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
                 dash_player(client.player);

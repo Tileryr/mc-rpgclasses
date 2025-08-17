@@ -2,6 +2,8 @@ package com.mcclasses.rpgclassabilities.payload;
 
 import com.google.common.collect.ImmutableMap;
 import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
+import com.mcclasses.rpgclassabilities.payload.s2c.AddBindS2CPayload;
+import com.mcclasses.rpgclassabilities.payload.s2c.RemoveBindS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.network.codec.PacketCodec;
@@ -14,7 +16,10 @@ public class PayloadRegister {
 
     static private final Map<CustomPayload.Id, PacketCodec> S2CPayloads = ImmutableMap.<CustomPayload.Id, PacketCodec>builder()
             .put(UpdateCurrentClassS2CPayload.ID, UpdateCurrentClassS2CPayload.CODEC)
+            .put(AddBindS2CPayload.ID, AddBindS2CPayload.CODEC)
+            .put(RemoveBindS2CPayload.ID, RemoveBindS2CPayload.CODEC)
             .put(OPEN_CLASS_SELECT.id, OPEN_CLASS_SELECT.codec)
+
 
             .build();
 

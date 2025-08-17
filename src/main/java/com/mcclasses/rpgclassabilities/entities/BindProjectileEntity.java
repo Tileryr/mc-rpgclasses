@@ -9,6 +9,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -43,7 +44,7 @@ public class BindProjectileEntity extends ProjectileEntity {
         setVelocity(targetDirection.multiply(TRAVEL_SPEED));
         setOwner(owner);
         setTargetDirection(targetDirection);
-        dataTracker.set(TARGET_DIRECTION, new Vector3f((float) targetDirection.x, (float) targetDirection.y, (float) targetDirection.z));
+        dataTracker.set(TARGET_DIRECTION, targetDirection.toVector3f());
 
         if (!getWorld().isClient) {
             Rpgclassabilities.BIND_MANAGER.removeBind(owner, getServer());
@@ -54,8 +55,13 @@ public class BindProjectileEntity extends ProjectileEntity {
         this.targetDirection = targetDirection.normalize();
     }
 
-    public Vector3f getTargetDirection() {
-        return dataTracker.get(TARGET_DIRECTION);
+    public Vec3d getTargetDirection() {
+        Vector3f targetDirection = dataTracker.get(TARGET_DIRECTION);
+        return new Vec3d(
+                targetDirection.x,
+                targetDirection.y,
+                targetDirection.z
+        );
     }
 
     @Override

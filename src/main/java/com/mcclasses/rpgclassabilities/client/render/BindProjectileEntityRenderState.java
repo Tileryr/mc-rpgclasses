@@ -6,7 +6,7 @@ import org.joml.Vector3f;
 
 public class BindProjectileEntityRenderState extends EntityRenderState {
     public Vec3d ownerPosition;
-    public Vector3f direction;
+    public Vec3d direction;
     public float pitch;
     public float yaw;
 }

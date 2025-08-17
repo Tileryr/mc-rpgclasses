@@ -2,9 +2,12 @@ package com.mcclasses.rpgclassabilities.client;
 
 import com.mcclasses.rpgclassabilities.MixinDuckInterfaces.FovOveridable;
 import com.mcclasses.rpgclassabilities.Rpgclassabilities;
+import com.mcclasses.rpgclassabilities.client.render.BindChainRenderer;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityModel;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityRenderer;
 import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
+import com.mcclasses.rpgclassabilities.payload.s2c.AddBindS2CPayload;
+import com.mcclasses.rpgclassabilities.payload.s2c.RemoveBindS2CPayload;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import net.fabricmc.api.ClientModInitializer;
@@ -16,6 +19,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -24,8 +28,8 @@ import org.lwjgl.glfw.GLFW;
 
 public class RpgclassabilitiesClient implements ClientModInitializer {
     public static final TickScheduler SCHEDULER = new TickScheduler();
+    public static final BindChainRenderer BIND_CHAIN_RENDERER = new BindChainRenderer();
 
-    public static final EntityModelLayer BIND_PROJECTILE_MODEL_LAYER = new EntityModelLayer(Rpgclassabilities.BIND_PROJECTILE_ID, "main");
 
     private static final KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.rpgclassabilities.ability_1",
@@ -48,11 +52,17 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.register(Rpgclassabilities.BIND_PROJECTILE, BindProjectileEntityRenderer::new);
-        EntityModelLayerRegistry.registerModelLayer(BIND_PROJECTILE_MODEL_LAYER, BindProjectileEntityModel::getTexturedModelData);
-
+        EntityModelLayerRegistry.registerModelLayer(BindProjectileEntityRenderer.BIND_PROJECTILE_MODEL_LAYER, BindProjectileEntityModel::getTexturedModelData);
         CurrentRpgClass.register();
+
         ClientPlayNetworking.registerGlobalReceiver(PayloadRegister.OPEN_CLASS_SELECT.id, (payload, context) -> {
             context.client().setScreen(new ClassScreen(Text.empty()));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(AddBindS2CPayload.ID, (payload, context) -> {
+            BIND_CHAIN_RENDERER.addChain(payload.bindId, payload.bindOriginPosition, payload.boundEntityPosition);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(RemoveBindS2CPayload.ID, (payload, context) -> {
+            BIND_CHAIN_RENDERER.removeChain(payload.bindOriginId());
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER::onEndTick);

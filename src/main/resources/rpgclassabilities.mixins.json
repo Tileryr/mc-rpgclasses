@@ -8,7 +8,7 @@
     "AbstractClientPlayerEntityMixin"
   ],
   "client": [
-
+    "WorldRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

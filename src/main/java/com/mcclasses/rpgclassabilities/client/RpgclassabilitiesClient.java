@@ -6,10 +6,12 @@ import com.mcclasses.rpgclassabilities.client.render.BindChainRenderer;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityModel;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityRenderer;
 import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
+import com.mcclasses.rpgclassabilities.payload.s2c.AbilityUseFailedS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.AddBindS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.RemoveBindS2CPayload;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
+import com.mcclasses.rpgclassabilities.util.Conversion;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -29,7 +31,6 @@ import org.lwjgl.glfw.GLFW;
 public class RpgclassabilitiesClient implements ClientModInitializer {
     public static final TickScheduler SCHEDULER = new TickScheduler();
     public static final BindChainRenderer BIND_CHAIN_RENDERER = new BindChainRenderer();
-
 
     private static final KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.rpgclassabilities.ability_1",
@@ -64,6 +65,12 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(RemoveBindS2CPayload.ID, (payload, context) -> {
             BIND_CHAIN_RENDERER.removeChain(payload.bindOriginId());
         });
+        ClientPlayNetworking.registerGlobalReceiver(AbilityUseFailedS2CPayload.ID, ((payload, context) -> {
+            context.player().sendMessage( Text.literal(
+                            "Ability cooldown: " + Conversion.ticksToSeconds(payload.ticksUntilActive()) + "s"),
+                    true
+            );
+        }));
 
         ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER::onEndTick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

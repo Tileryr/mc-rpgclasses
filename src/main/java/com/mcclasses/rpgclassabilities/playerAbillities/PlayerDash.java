@@ -16,20 +16,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.TeleportTarget;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class PlayerDash {
     public static final int DASH_TIME = 6;
-    public static final int DASH_COOLDOWN = 40;
     public static final float DASH_DISTANCE = 12;
     private static final Identifier MOVEMENT_MODIFIER_ID = Identifier.of(Rpgclassabilities.MOD_ID, "dash_speed_halt");
-
-    private static Map<UUID, Boolean> playersCanDash = new HashMap<>();
 
     private final ServerPlayerEntity player;
     private final Vec3d playerRotationVector;
@@ -50,16 +42,6 @@ public class PlayerDash {
     }
 
     private void dashPlayer() {
-        if (!playerCanDash(player)) {
-            player.sendMessage( Text.literal(
-                    "Dash cooldown: " + Conversion.ticksToSeconds(Rpgclassabilities.SCHEDULER.getTicksLeft(player.getUuid())) + "s") ,
-                    true
-            );
-            return;
-        } else {
-            setPlayerCanDash(player,false);
-        }
-
         Vec3d playerPosition = player.getPos();
 
         EntityAttributeInstance playerMovement = player.getAttributes().getCustomInstance(EntityAttributes.MOVEMENT_SPEED);
@@ -103,9 +85,6 @@ public class PlayerDash {
 
         spawnDashSmoke(player.getWorld(), dashTarget);
         setHidden(false);
-        Rpgclassabilities.SCHEDULER.addTimer(player.getUuid(), DASH_COOLDOWN, () -> {
-            setPlayerCanDash(player, true);
-        });
     }
 
     private static void spawnDashSmoke(ServerWorld world, Vec3d position) {
@@ -114,14 +93,6 @@ public class PlayerDash {
                 position.x, position.y, position.z,
                 50, 1, 0.5, 1, 1
         );
-    }
-
-    private void setPlayerCanDash(ServerPlayerEntity player, boolean dashAble) {
-        playersCanDash.put(player.getUuid(), dashAble);
-    }
-
-    private boolean playerCanDash(ServerPlayerEntity player) {
-        return playersCanDash.computeIfAbsent(player.getUuid(), uuid -> true);
     }
 
     private void setHidden(boolean on) {

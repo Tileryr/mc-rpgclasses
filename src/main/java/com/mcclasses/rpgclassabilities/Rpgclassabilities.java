@@ -5,8 +5,10 @@ import com.mcclasses.rpgclassabilities.entities.BindProjectileEntity;
 import com.mcclasses.rpgclassabilities.enums.RpgClass;
 import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
 import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
+import com.mcclasses.rpgclassabilities.payload.s2c.AbilityUseFailedS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
 import com.mcclasses.rpgclassabilities.playerAbillities.BindManager;
+import com.mcclasses.rpgclassabilities.playerAbillities.PlayerAbilities;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -31,6 +33,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.chunk.WorldChunk;
 
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -39,6 +42,8 @@ public class Rpgclassabilities implements ModInitializer {
     public static final String MOD_ID = "rpgclassabilities";
 
     public static final BindManager BIND_MANAGER = new BindManager();
+    public static final PlayerAbilities PLAYER_ABILITIES = new PlayerAbilities(SCHEDULER);
+
     public static final Identifier BIND_PROJECTILE_ID = Identifier.of(MOD_ID, "bind_projectile");
     public static final EntityType<BindProjectileEntity> BIND_PROJECTILE = Registry.register(
             Registries.ENTITY_TYPE,
@@ -76,14 +81,11 @@ public class Rpgclassabilities implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(
                 PayloadRegister.ABILITY_ONE_PRESSED.id,
                 (payload, context) -> {
-                    BindProjectileEntity bindProjectileEntity = new BindProjectileEntity(
-                            context.player().getWorld(),
-                            context.player(),
-                            context.player().getRotationVector()
+                    PlayerData playerData = StateSaverAndLoader.getPlayerState(context.player(), false);
+                    Optional<Integer> ticksUntilCooldownOver = PLAYER_ABILITIES.runAbilityOne(playerData.playerClass, context);
+                    ticksUntilCooldownOver.ifPresent(integer ->
+                            ServerPlayNetworking.send(context.player(), new AbilityUseFailedS2CPayload(integer))
                     );
-                    context.player().getWorld().spawnEntity(bindProjectileEntity);
-                    bindProjectileEntity.setPosition(context.player().getPos().add(0, 1.5, 0));
-//                    new PlayerDash(context.player());
                 });
 
         ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, minecraftServer) -> {

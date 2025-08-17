@@ -103,8 +103,11 @@ public class BindManager implements ServerTickEvents.EndTick {
             boundEntityMaxHealthInstance.removeModifier(BOUND_MODIFIER_ID);
         }
 
-        bindPairs.remove(bindOriginId);
-        sendPacketToAllPlayers((ServerWorld) bindOrigin.getWorld(), new RemoveBindS2CPayload(bindOriginId));
+        if (bindPairs.containsKey(bindOriginId)) {
+            bindPairs.remove(bindOriginId);
+            sendPacketToAllPlayers((ServerWorld) bindOrigin.getWorld(), new RemoveBindS2CPayload(bindOriginId));
+            sendPacketToAllPlayers((ServerWorld) boundEntity.getWorld(), new RemoveBindS2CPayload(bindOriginId));
+        }
     }
 
     private void sendPacketToAllPlayers(ServerWorld world, CustomPayload payload) {

@@ -5,10 +5,12 @@ import com.mcclasses.rpgclassabilities.Rpgclassabilities;
 import com.mcclasses.rpgclassabilities.client.render.BindChainRenderer;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityModel;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityRenderer;
+import com.mcclasses.rpgclassabilities.enums.RpgClass;
 import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
 import com.mcclasses.rpgclassabilities.payload.s2c.AbilityUseFailedS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.AddBindS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.RemoveBindS2CPayload;
+import com.mcclasses.rpgclassabilities.playerAbillities.PlayerAbilities;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mcclasses.rpgclassabilities.util.Conversion;
@@ -31,6 +33,7 @@ import org.lwjgl.glfw.GLFW;
 public class RpgclassabilitiesClient implements ClientModInitializer {
     public static final TickScheduler SCHEDULER = new TickScheduler();
     public static final BindChainRenderer BIND_CHAIN_RENDERER = new BindChainRenderer();
+    public static final PlayerAbilities PLAYER_ABILITIES = new PlayerAbilities(SCHEDULER);
 
     private static final KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.rpgclassabilities.ability_1",
@@ -38,17 +41,6 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
             GLFW.GLFW_KEY_C,
             "category.rpgclassabilities.rpgclasses"
     ));
-
-    private void dash_player(ClientPlayerEntity clientPlayer) {
-        if (clientPlayer instanceof FovOveridable player) {
-            player.rpgclassabilities$setFovOverrideValue(1.6F);
-            player.rpgclassabilities$setOverrideFov(true);
-
-            SCHEDULER.addTimer((int) PlayerDash.DASH_TIME, () -> {
-                player.rpgclassabilities$setOverrideFov(false);
-            });
-        }
-    }
 
     @Override
     public void onInitializeClient() {
@@ -75,7 +67,7 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER::onEndTick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
-                dash_player(client.player);
+                PLAYER_ABILITIES.runAbilityOneClient(RpgClass.WARRIOR, client.player);
                 ClientPlayNetworking.send(PayloadRegister.ABILITY_ONE_PRESSED);
             }
         });

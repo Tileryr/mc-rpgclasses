@@ -7,4 +7,9 @@ public interface FovOveridable {
     boolean rpgclassabilities$getOverrideFov();
 
     void rpgclassabilities$setFovOverrideValue(float fovOverrideValue);
+
+    default void rpgclassabilities$activateOverrideFov(float fovOverrideValue) {
+        rpgclassabilities$setOverrideFov(true);
+        rpgclassabilities$setFovOverrideValue(fovOverrideValue);
+    }
 }

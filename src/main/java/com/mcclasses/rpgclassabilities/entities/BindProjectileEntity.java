@@ -46,7 +46,7 @@ public class BindProjectileEntity extends ProjectileEntity {
         setTargetDirection(targetDirection);
         dataTracker.set(TARGET_DIRECTION, targetDirection.toVector3f());
 
-        if (!getWorld().isClient) {
+        if (!getWorld().isClient && Rpgclassabilities.BIND_MANAGER.isBinding(owner.getUuid())) {
             Rpgclassabilities.BIND_MANAGER.removeBind(owner, getServer());
         }
     }

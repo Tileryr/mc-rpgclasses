@@ -5,7 +5,11 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "PersistentStateManagerMixin",
-    "AbstractClientPlayerEntityMixin"
+    "AbstractClientPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "PlayerEntityMixin",
+    "LivingEntityMixin",
+    "EntityMixin"
   ],
   "client": [
     "WorldRenderMixin"

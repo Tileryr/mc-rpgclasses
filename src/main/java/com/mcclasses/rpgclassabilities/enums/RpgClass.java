@@ -5,10 +5,10 @@ import com.mojang.serialization.Codec;
 import net.minecraft.util.StringIdentifiable;
 
 public enum RpgClass implements StringIdentifiable {
-    WARRIOR("Warrior", 80),
+    WARRIOR("Warrior", 400),
     ROGUE("Rogue", 40),
     CLERIC("Cleric", 200),
-    WIZARD("Wizard", 0);
+    WIZARD("Wizard", 2);
 
     private final String id;
     public final int abilityOneCooldown;

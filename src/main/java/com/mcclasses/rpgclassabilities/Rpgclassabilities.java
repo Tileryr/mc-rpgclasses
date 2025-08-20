@@ -84,7 +84,7 @@ public class Rpgclassabilities implements ModInitializer {
                 PayloadRegister.ABILITY_ONE_PRESSED.id,
                 (payload, context) -> {
                     PlayerData playerData = StateSaverAndLoader.getPlayerState(context.player(), false);
-                    Optional<Integer> ticksUntilCooldownOver = PLAYER_ABILITIES.runAbilityOne(RpgClass.WARRIOR, context);
+                    Optional<Integer> ticksUntilCooldownOver = PLAYER_ABILITIES.runAbilityOne(RpgClass.WIZARD, context);
                     ticksUntilCooldownOver.ifPresent(integer ->
                             ServerPlayNetworking.send(context.player(), new AbilityUseFailedS2CPayload(integer))
                     );

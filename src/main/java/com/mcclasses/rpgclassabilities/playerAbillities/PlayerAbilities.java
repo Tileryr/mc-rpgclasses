@@ -63,9 +63,8 @@ public class PlayerAbilities {
                     bindProjectileEntity.setPosition(player.getPos().add(0, 1.5, 0));
                 }
                 case ROGUE -> new PlayerDash(player);
-                case WARRIOR -> {
-                    new PlayerCharge(player, Rpgclassabilities.SCHEDULER).charge();
-                }
+                case WARRIOR -> new PlayerCharge(player, Rpgclassabilities.SCHEDULER).charge();
+                case WIZARD -> new PlayerTransmute(player).transmute();
             }
         } catch (Exception e) {
             canUseAbilityOne.put(player.getUuid(), true);
@@ -95,9 +94,8 @@ public class PlayerAbilities {
             case ROGUE -> {
                 dashPlayer(player);
             }
-            case WARRIOR -> {
-                new PlayerCharge(player, RpgclassabilitiesClient.SCHEDULER).charge();
-            }
+            case WARRIOR -> new PlayerCharge(player, RpgclassabilitiesClient.SCHEDULER).charge();
+            case WIZARD -> new PlayerTransmute(player).transmute();
         }
     }
 }

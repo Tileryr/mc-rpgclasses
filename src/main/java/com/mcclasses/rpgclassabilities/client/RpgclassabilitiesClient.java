@@ -67,7 +67,7 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER::onEndTick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
-                PLAYER_ABILITIES.runAbilityOneClient(RpgClass.WARRIOR, client.player);
+                PLAYER_ABILITIES.runAbilityOneClient(RpgClass.WIZARD, client.player);
                 ClientPlayNetworking.send(PayloadRegister.ABILITY_ONE_PRESSED);
             }
         });

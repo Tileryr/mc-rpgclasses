@@ -59,7 +59,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements CanCharg
         return scaleVariableCharge(knockback, (float) PlayerCharge.MAX_CHARGE_KNOCKBACK_MULTIPLIER) + 1.0F;
     }
 
-
     @Inject(method = "tick", at = @At("TAIL"))
     public void tickMixin(CallbackInfo ci) {
         if (currentlyCharging) {

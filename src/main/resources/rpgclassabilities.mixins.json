@@ -4,15 +4,13 @@
   "package": "com.mcclasses.rpgclassabilities.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PersistentStateManagerMixin",
-    "AbstractClientPlayerEntityMixin",
-    "ServerPlayNetworkHandlerMixin",
     "PlayerEntityMixin",
     "LivingEntityMixin",
     "EntityMixin"
   ],
   "client": [
-    "WorldRenderMixin"
+    "WorldRenderMixin",
+    "AbstractClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

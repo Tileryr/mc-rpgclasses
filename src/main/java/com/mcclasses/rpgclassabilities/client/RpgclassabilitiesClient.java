@@ -9,6 +9,7 @@ import com.mcclasses.rpgclassabilities.payload.s2c.AbilityUseFailedS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.AddBindS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.RemoveBindS2CPayload;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerAbilities;
+import com.mcclasses.rpgclassabilities.playerAbillities.PlayerAbilitiesClient;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerTransmute;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mcclasses.rpgclassabilities.util.Conversion;
@@ -30,7 +31,7 @@ import org.lwjgl.glfw.GLFW;
 public class RpgclassabilitiesClient implements ClientModInitializer {
     public static final TickScheduler SCHEDULER = new TickScheduler();
     public static final BindChainRenderer BIND_CHAIN_RENDERER = new BindChainRenderer();
-    public static final PlayerAbilities PLAYER_ABILITIES = new PlayerAbilities(SCHEDULER);
+    public static final PlayerAbilitiesClient PLAYER_ABILITIES = new PlayerAbilitiesClient();
 
     private static final KeyBinding abilityOneKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.rpgclassabilities.ability_1",
@@ -55,7 +56,7 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
 
         ParticleFactoryRegistry.getInstance().register(PlayerTransmute.TRANSMUTE_PARTICLE, EndRodParticle.Factory::new);
 
-        PLAYER_ABILITIES.registerClient();
+        PLAYER_ABILITIES.register();
         ClientPlayNetworking.registerGlobalReceiver(PayloadRegister.OPEN_CLASS_SELECT.id, (payload, context) -> {
             context.client().setScreen(new ClassSelectScreen(Text.empty()));
         });

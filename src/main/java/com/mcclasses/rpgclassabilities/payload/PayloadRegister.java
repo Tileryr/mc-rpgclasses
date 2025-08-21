@@ -13,7 +13,8 @@ import net.minecraft.network.packet.CustomPayload;
 import java.util.Map;
 
 public class PayloadRegister {
-    public static final BlankPayload OPEN_CLASS_SELECT = new BlankPayload("ability_one_pressed");
+    public static final BlankPayload OPEN_CLASS_SELECT = new BlankPayload("open_class_select");
+    public static final BlankPayload ABILITY_ONE_ACTIVE = new BlankPayload("ability_one_active");
 
     static private final Map<CustomPayload.Id, PacketCodec> S2CPayloads = ImmutableMap.<CustomPayload.Id, PacketCodec>builder()
             .put(UpdateCurrentClassS2CPayload.ID, UpdateCurrentClassS2CPayload.CODEC)
@@ -21,7 +22,7 @@ public class PayloadRegister {
             .put(RemoveBindS2CPayload.ID, RemoveBindS2CPayload.CODEC)
             .put(AbilityUseFailedS2CPayload.ID, AbilityUseFailedS2CPayload.CODEC)
             .put(OPEN_CLASS_SELECT.id, OPEN_CLASS_SELECT.codec)
-
+            .put(ABILITY_ONE_ACTIVE.id, ABILITY_ONE_ACTIVE.codec)
 
             .build();
 

@@ -8,7 +8,9 @@ import com.mcclasses.rpgclassabilities.client.CurrentRpgClass;
 import com.mcclasses.rpgclassabilities.client.RpgclassabilitiesClient;
 import com.mcclasses.rpgclassabilities.entities.BindProjectileEntity;
 import com.mcclasses.rpgclassabilities.enums.RpgClass;
+import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,25 +30,38 @@ public class PlayerAbilities {
         this.scheduler = scheduler;
     }
 
-    private boolean playerCanUseAbilityOne(UUID uuid) {
+    private boolean playerCanUseAbilityOne(UUID uuid, boolean isClient) {
         return canUseAbilityOne.computeIfAbsent(uuid, (uuid_) -> true);
     }
 
-    private boolean updateAbilityOneTimer(PlayerEntity player, RpgClass rpgClass) {
+    public void registerClient() {
+        ClientPlayNetworking.registerGlobalReceiver(PayloadRegister.ABILITY_ONE_ACTIVE.id, (payload, context) -> {
+            canUseAbilityOne.put(context.player().getUuid(), true);
+        });
+    }
+
+    private boolean updateAbilityOneTimer(PlayerEntity player, RpgClass rpgClass, boolean isClient) {
         UUID playerUuid = player.getUuid();
+        if (!isClient) {
+            if (!playerCanUseAbilityOne(playerUuid, false)) {
+                return false;
+            }
+            canUseAbilityOne.put(playerUuid, false);
+            scheduler.addTimer(playerUuid, rpgClass.abilityOneCooldown, () -> {
+                canUseAbilityOne.put(playerUuid, true);
+                ServerPlayNetworking.send((ServerPlayerEntity) player, PayloadRegister.ABILITY_ONE_ACTIVE);
+            });
 
-        if (!playerCanUseAbilityOne(playerUuid)) {
-            return false;
+            return true;
+        } else {
+            canUseAbilityOne.put(playerUuid, false);
+            return playerCanUseAbilityOne(playerUuid, true);
         }
-        canUseAbilityOne.put(playerUuid, false);
-        scheduler.addTimer(playerUuid, rpgClass.abilityOneCooldown, () -> canUseAbilityOne.put(playerUuid, true));
-
-        return true;
     }
 
     public Optional<Integer> runAbilityOne(RpgClass rpgClass, ServerPlayNetworking.Context context) {
         ServerPlayerEntity player = context.player();
-        if (!updateAbilityOneTimer(player, rpgClass)) {
+        if (!updateAbilityOneTimer(player, rpgClass, false)) {
             return Optional.of(scheduler.getTicksLeft(player.getUuid()));
         }
 
@@ -85,7 +100,7 @@ public class PlayerAbilities {
     }
 
     public void runAbilityOneClient(RpgClass rpgClass, ClientPlayerEntity player) {
-        if (!updateAbilityOneTimer(player, rpgClass)) {
+        if (!updateAbilityOneTimer(player, rpgClass, true)) {
             return;
         }
 

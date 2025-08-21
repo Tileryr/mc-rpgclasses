@@ -55,6 +55,7 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
 
         ParticleFactoryRegistry.getInstance().register(PlayerTransmute.TRANSMUTE_PARTICLE, EndRodParticle.Factory::new);
 
+        PLAYER_ABILITIES.registerClient();
         ClientPlayNetworking.registerGlobalReceiver(PayloadRegister.OPEN_CLASS_SELECT.id, (payload, context) -> {
             context.client().setScreen(new ClassSelectScreen(Text.empty()));
         });

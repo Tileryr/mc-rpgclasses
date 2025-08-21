@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.util.StringIdentifiable;
 
 public enum RpgClass implements StringIdentifiable {
-    WARRIOR("Warrior", 40),
+    WARRIOR("Warrior", 400),
     ROGUE("Rogue", 40),
     CLERIC("Cleric", 200),
     WIZARD("Wizard", 2);

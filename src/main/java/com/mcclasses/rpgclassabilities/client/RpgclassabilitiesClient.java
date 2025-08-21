@@ -1,17 +1,14 @@
 package com.mcclasses.rpgclassabilities.client;
 
-import com.mcclasses.rpgclassabilities.MixinDuckInterfaces.FovOveridable;
 import com.mcclasses.rpgclassabilities.Rpgclassabilities;
 import com.mcclasses.rpgclassabilities.client.render.BindChainRenderer;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityModel;
 import com.mcclasses.rpgclassabilities.client.render.BindProjectileEntityRenderer;
-import com.mcclasses.rpgclassabilities.enums.RpgClass;
 import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
 import com.mcclasses.rpgclassabilities.payload.s2c.AbilityUseFailedS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.AddBindS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.RemoveBindS2CPayload;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerAbilities;
-import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerTransmute;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mcclasses.rpgclassabilities.util.Conversion;
@@ -23,11 +20,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
@@ -38,12 +32,20 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
     public static final BindChainRenderer BIND_CHAIN_RENDERER = new BindChainRenderer();
     public static final PlayerAbilities PLAYER_ABILITIES = new PlayerAbilities(SCHEDULER);
 
-    private static final KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    private static final KeyBinding abilityOneKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.rpgclassabilities.ability_1",
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_C,
             "category.rpgclassabilities.rpgclasses"
     ));
+
+    private static final KeyBinding openClassScreenKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.rpgclassabilities.open_class_screen",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_V,
+            "category.rpgclassabilities.rpgclasses"
+    ));
+
 
     @Override
     public void onInitializeClient() {
@@ -54,7 +56,7 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(PlayerTransmute.TRANSMUTE_PARTICLE, EndRodParticle.Factory::new);
 
         ClientPlayNetworking.registerGlobalReceiver(PayloadRegister.OPEN_CLASS_SELECT.id, (payload, context) -> {
-            context.client().setScreen(new ClassScreen(Text.empty()));
+            context.client().setScreen(new ClassSelectScreen(Text.empty()));
         });
         ClientPlayNetworking.registerGlobalReceiver(AddBindS2CPayload.ID, (payload, context) -> {
             BIND_CHAIN_RENDERER.addChain(payload.bindId, payload.bindOriginPosition, payload.boundEntityPosition);
@@ -71,9 +73,12 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER::onEndTick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (keyBinding.wasPressed()) {
+            while (abilityOneKeyBinding.wasPressed()) {
                 PLAYER_ABILITIES.runAbilityOneClient(CurrentRpgClass.getCurrentRpgClass(), client.player);
                 ClientPlayNetworking.send(PayloadRegister.ABILITY_ONE_PRESSED);
+            }
+            while (openClassScreenKeyBinding.wasPressed()) {
+                client.setScreen(new ClassScreen(Text.empty()));
             }
         });
         ClientTickEvents.END_CLIENT_TICK.register(PlayerTransmute::onEndTickClient);

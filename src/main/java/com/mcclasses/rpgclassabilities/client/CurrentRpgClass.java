@@ -14,7 +14,6 @@ public class CurrentRpgClass {
     public static void register() {
         ClientPlayNetworking.registerGlobalReceiver(UpdateCurrentClassS2CPayload.ID, ((payload, context) -> {
             currentRpgClass = payload.newRpgClass();
-            context.player().networkHandler.sendChatMessage("The client says our class is: " + currentRpgClass.asString());
         }));
     }
 }

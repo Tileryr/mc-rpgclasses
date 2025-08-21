@@ -49,7 +49,7 @@ public class Rpgclassabilities implements ModInitializer {
             BIND_PROJECTILE_ID,
             EntityType.Builder
                     .<BindProjectileEntity>create(BindProjectileEntity::new, SpawnGroup.MISC)
-                    .dimensions(5F, 5F)
+                    .dimensions(1F, 1F)
                     .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, BIND_PROJECTILE_ID))
             );
 

@@ -163,10 +163,6 @@ public class PlayerCharge {
                     });
                 });
             });
-
-
-//            player.getBlockPos();
-
         }));
     }
 

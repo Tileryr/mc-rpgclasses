@@ -7,10 +7,7 @@ import com.mcclasses.rpgclassabilities.payload.PayloadRegister;
 import com.mcclasses.rpgclassabilities.payload.c2s.SelectClassC2SPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.AbilityUseFailedS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.UpdateCurrentClassS2CPayload;
-import com.mcclasses.rpgclassabilities.playerAbillities.BindManager;
-import com.mcclasses.rpgclassabilities.playerAbillities.PlayerAbilities;
-import com.mcclasses.rpgclassabilities.playerAbillities.PlayerCharge;
-import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
+import com.mcclasses.rpgclassabilities.playerAbillities.*;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
@@ -56,6 +53,7 @@ public class Rpgclassabilities implements ModInitializer {
                     .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, BIND_PROJECTILE_ID))
             );
 
+
     public static void setRpgClass(RpgClass rpgClass, ServerPlayerEntity player) {
         PlayerData playerData = StateSaverAndLoader.getPlayerState(player, true);
         playerData.playerClass = rpgClass;
@@ -73,6 +71,7 @@ public class Rpgclassabilities implements ModInitializer {
 
         PayloadRegister.register();
         Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, "dash_smoke"), FabricParticleTypes.simple());
+        Registry.register(Registries.PARTICLE_TYPE, PlayerTransmute.TRANSMUTE_PARTICLE_ID, PlayerTransmute.TRANSMUTE_PARTICLE);
 
         ServerPlayNetworking.registerGlobalReceiver(SelectClassC2SPayload.ID, (payload, context) -> {
             PlayerData playerData = StateSaverAndLoader.getPlayerState(context.player(), true);
@@ -84,7 +83,7 @@ public class Rpgclassabilities implements ModInitializer {
                 PayloadRegister.ABILITY_ONE_PRESSED.id,
                 (payload, context) -> {
                     PlayerData playerData = StateSaverAndLoader.getPlayerState(context.player(), false);
-                    Optional<Integer> ticksUntilCooldownOver = PLAYER_ABILITIES.runAbilityOne(RpgClass.WIZARD, context);
+                    Optional<Integer> ticksUntilCooldownOver = PLAYER_ABILITIES.runAbilityOne(playerData.playerClass, context);
                     ticksUntilCooldownOver.ifPresent(integer ->
                             ServerPlayNetworking.send(context.player(), new AbilityUseFailedS2CPayload(integer))
                     );

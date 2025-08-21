@@ -19,6 +19,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -92,6 +93,10 @@ public class PlayerCharge {
                 CHARGE_SPEED,
                 EntityAttributeModifier.Operation.ADD_VALUE
         ));
+
+        if (player.getWorld() instanceof ServerWorld serverWorld) {
+            spawnSmoke(serverWorld, player, 20);
+        }
     }
 
     private void endCharge() {
@@ -103,6 +108,14 @@ public class PlayerCharge {
                 player,
                 getAttribute(player, EntityAttributes.MOVEMENT_SPEED),
                 getAttribute(player, EntityAttributes.ATTACK_DAMAGE)
+        );
+    }
+
+    private static void spawnSmoke(ServerWorld world, PlayerEntity player, int count) {
+        world.spawnParticles(
+                ParticleTypes.EXPLOSION,
+                player.getX(), player.getY(), player.getZ(),
+                count, 1, 0.5, 1, 0.6
         );
     }
 
@@ -118,6 +131,10 @@ public class PlayerCharge {
         player.setSprinting(false);
 
         playerMovement.removeModifier(CHARGE_MOVEMENT_MODIFIER_ID);
+
+        if (player.getWorld() instanceof ServerWorld serverWorld) {
+            spawnSmoke(serverWorld, player, 10);
+        }
     }
 
     private static EntityAttributeInstance getAttribute(PlayerEntity player, RegistryEntry<EntityAttribute> attribute) {
@@ -141,6 +158,7 @@ public class PlayerCharge {
                         float blockHardness = blockState.getHardness(world, blockPos);
                         if (blockHardness > 0 && blockHardness < BLOCK_BREAK_POWER) {
                             player.getWorld().breakBlock(blockPos, false);
+                            spawnSmoke(world, player, 3);
                         }
                     });
                 });

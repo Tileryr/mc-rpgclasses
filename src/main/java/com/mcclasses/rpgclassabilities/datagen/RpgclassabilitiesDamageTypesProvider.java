@@ -11,7 +11,6 @@ import net.minecraft.registry.RegistryWrapper;
 import java.util.concurrent.CompletableFuture;
 
 public class RpgclassabilitiesDamageTypesProvider extends FabricDynamicRegistryProvider {
-
     public RpgclassabilitiesDamageTypesProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
         super(output, registriesFuture);
     }

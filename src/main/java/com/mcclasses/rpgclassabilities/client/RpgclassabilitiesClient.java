@@ -12,6 +12,7 @@ import com.mcclasses.rpgclassabilities.payload.s2c.AddBindS2CPayload;
 import com.mcclasses.rpgclassabilities.payload.s2c.RemoveBindS2CPayload;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerAbilities;
 import com.mcclasses.rpgclassabilities.playerAbillities.PlayerDash;
+import com.mcclasses.rpgclassabilities.playerAbillities.PlayerTransmute;
 import com.mcclasses.rpgclassabilities.timers.TickScheduler;
 import com.mcclasses.rpgclassabilities.util.Conversion;
 import net.fabricmc.api.ClientModInitializer;
@@ -19,10 +20,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.particle.*;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
@@ -48,6 +51,8 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(BindProjectileEntityRenderer.BIND_PROJECTILE_MODEL_LAYER, BindProjectileEntityModel::getTexturedModelData);
         CurrentRpgClass.register();
 
+        ParticleFactoryRegistry.getInstance().register(PlayerTransmute.TRANSMUTE_PARTICLE, EndRodParticle.Factory::new);
+
         ClientPlayNetworking.registerGlobalReceiver(PayloadRegister.OPEN_CLASS_SELECT.id, (payload, context) -> {
             context.client().setScreen(new ClassScreen(Text.empty()));
         });
@@ -67,11 +72,11 @@ public class RpgclassabilitiesClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(SCHEDULER::onEndTick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
-                PLAYER_ABILITIES.runAbilityOneClient(RpgClass.WIZARD, client.player);
+                PLAYER_ABILITIES.runAbilityOneClient(CurrentRpgClass.getCurrentRpgClass(), client.player);
                 ClientPlayNetworking.send(PayloadRegister.ABILITY_ONE_PRESSED);
             }
         });
-
+        ClientTickEvents.END_CLIENT_TICK.register(PlayerTransmute::onEndTickClient);
         ClientPlayConnectionEvents.JOIN.register((t, a, client) -> {});
     }
 }

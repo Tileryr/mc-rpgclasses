@@ -78,7 +78,7 @@ public class PlayerAbilities {
             player.rpgclassabilities$setFovOverrideValue(1.6F);
             player.rpgclassabilities$setOverrideFov(true);
 
-            RpgclassabilitiesClient.SCHEDULER.addTimer((int) PlayerDash.DASH_TIME, () -> {
+            RpgclassabilitiesClient.SCHEDULER.addTimer(PlayerDash.DASH_TIME, () -> {
                 player.rpgclassabilities$setOverrideFov(false);
             });
         }
